@@ -8,6 +8,8 @@ from parser import parse
 
 from evaluator import evaluate
 
+import evaluator
+
 def main():
     environment = {}
     
@@ -19,7 +21,24 @@ def main():
         try:
             tokens = tokenize(source_code)
             ast = parse(tokens)
+
+            # Check for debug argument
+            if len(sys.argv) == 3:
+                if sys.argv[2].startswith("watch="):
+                    debugWatchIdentifier = sys.argv[2].split("watch=")[1]
+                    if debugWatchIdentifier.startswith('<') and debugWatchIdentifier.endswith('>'):
+                        debugWatchIdentifier = debugWatchIdentifier[1:-1]
+                        print("-----DEBUG WATCHING: " ,debugWatchIdentifier, "-----")
+                        evaluator.debugWatch = debugWatchIdentifier
+                    else: 
+                        print("Format for debug argument should be: watch=<identifier>")
+                        exit()
+                else: 
+                    print("Format for debug argument should be: watch=<identifier>")
+                    exit()
+
             final_value, exit_status = evaluate(ast, environment)
+
             if exit_status == "exit":
                 # print(f"Exiting with code: {final_value}") # Optional debug print
                 sys.exit(final_value if isinstance(final_value, int) else 0)

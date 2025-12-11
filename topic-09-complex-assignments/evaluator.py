@@ -3,6 +3,8 @@ from parser import parse
 from pprint import pprint
 import copy
 
+debugWatch = ""
+
 def type_of(*args):
     def single_type(x):
         if isinstance(x, bool):
@@ -479,6 +481,9 @@ def evaluate(ast, environment):
         assert "target" in ast
         target = ast["target"]
 
+        #ADDED: Declare name
+        name = None
+
         if target["tag"] == "identifier":
             name = target["value"]
 
@@ -520,6 +525,11 @@ def evaluate(ast, environment):
                 assert False, f"Cannot assign to base of type {type(base)}"
 
         value, value_status = evaluate(ast["value"], environment)
+
+        #ADDED: watch for identifier
+        if name == debugWatch:
+            print(f"-----DEBUG-----\n{debugWatch} new value: {value}\n---------------")
+
         if value_status == "exit": return value, "exit"
 
         target_base[target_index] = value
